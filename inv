@@ -1,0 +1,14 @@
+[all:vars]
+ansible_user = matt
+
+[ubuntu]
+192.168.2.12
+192.168.2.15
+192.168.2.16
+
+[docker]
+192.168.2.15
+192.168.2.16
+
+[docker:vars]
+compose_dir = /home/matt

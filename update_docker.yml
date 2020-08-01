@@ -1,0 +1,58 @@
+---
+- name: Update docker containers defined in compose. 
+  hosts: docker
+
+  pre_tasks:
+    - name: Ensure pip3 is installed.
+      become: yes
+      apt: 
+        name: python3-pip
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Ensure required python modules are installed.
+      pip:
+        name: 
+         - docker
+         - docker-compose
+
+    - name: Check if Mullvad VPN is installed
+      stat:
+        path: /usr/bin/mullvad
+      register: stat_result
+
+  tasks:
+    - name: Get a list of running containers.
+      docker_host_info:
+        containers: True
+      register: docker_info
+
+    - debug:
+        var: ansible_uptime_seconds 
+      
+    #Added this because containers sometimes don't properly shut down on restart and need to be removed to start containers with the same name after pull  
+    - name: Stop and remove containers if server was restarted in the last two minutes.
+      when: ansible_uptime_seconds < 120
+      docker_container:
+        name: '{{ item.Names[0] | regex_replace("^/", "") }}'
+        state: absent
+      loop: '{{ docker_info.containers }}'
+
+    #Pull sometimes doen't work while Mullvad VPN is connected
+    - name: Disconnect Mullvad VPN.
+      when: stat_result.stat.exists == True
+      shell: |
+        mullvad always-require-vpn set off
+        mullvad disconnect
+
+    - name: Pull and start containers.
+      docker_compose:
+        project_src: "{{ compose_dir }}"
+        pull: yes
+        state: present
+
+    - name: Reconnect Mullvad VPN.
+      when: stat_result.stat.exists == True
+      shell: |
+        mullvad always-require-vpn set on
+        mullvad connect

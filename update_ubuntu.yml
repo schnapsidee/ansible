@@ -1,0 +1,30 @@
+---
+- name: Update Ubuntu servers.
+  hosts: ubuntu
+  become: yes
+
+  pre_tasks:
+    - name: Update apt cache if not updated in the last hour.
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+  tasks:
+    - name: Update all packaged to latest version.
+      apt:
+        upgrade: dist
+
+    - name: Check if restart is required.
+      stat:
+        path: /var/run/reboot-required
+      register: stat_result
+
+    - name: Restart servers if required.
+      reboot:
+      when: stat_result.stat.exists == True
+
+- name: Start update_docker playbook on docker hosts
+  import_playbook: update_docker.yml
+
+
+
