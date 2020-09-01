@@ -23,8 +23,5 @@
       reboot:
       when: stat_result.stat.exists == True
 
-- name: Start update_docker playbook on docker hosts
-  import_playbook: update_docker.yml
-
-
-
+    - name: Start update_docker playbook on docker hosts
+      import_playbook: update_docker.yml

@@ -14,7 +14,7 @@
       pip:
         name: 
          - docker
-         - docker-compose
+         - docker-compose 
 
     - name: Check if Mullvad VPN is installed
       stat:
@@ -31,8 +31,9 @@
         var: ansible_uptime_seconds 
       
     #Added this because containers sometimes don't properly shut down on restart and need to be removed to start containers with the same name after pull  
+    #Also don't want containers running without VPN
     - name: Stop and remove containers if server was restarted in the last two minutes.
-      when: ansible_uptime_seconds < 120
+      when: ansible_uptime_seconds < 120 or stat_result.stat.exists == True
       docker_container:
         name: '{{ item.Names[0] | regex_replace("^/", "") }}'
         state: absent
