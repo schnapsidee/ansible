@@ -1,0 +1,25 @@
+---
+- hosts: windows
+  gather_facts: yes
+  tasks:
+    # https://support.microsoft.com/en-us/help/4034879/how-to-add-the-ldapenforcechannelbinding-registry-entry
+    - name: Enable LDAP Enforce Channel Binding Registry Fix.
+      win_regedit:
+        path: HKLM:\System\CurrentControlSet\Services\NTDS\Parameters
+        name: LdapEnforceChannelBinding
+        data: 2
+        type: dword
+    # https://support.microsoft.com/en-us/help/4557222/how-to-manage-the-changes-in-netlogon-secure-channel-connections-assoc#DetectingNon-compliant
+    - name: Zerologon Registry Fix
+      win_regedit:
+        path: HKLM:\SYSTEM\CurrentControlSet\Services\Netlogon\Parameters
+        name: FullSecureChannelProtection
+        data: 1
+        type: dword
+    # https://msrc.microsoft.com/update-guide/en-US/vulnerability/ADV200013
+    - name: DNS UDP Spoof Workaround
+      win_regedit:
+        path: HKLM:\SYSTEM\CurrentControlSet\Services\DNS\Parameters
+        name: MaximumUdpPacketSize
+        data: 1221
+        type: dword

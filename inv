@@ -11,3 +11,6 @@ ansible_user = matt
 
 [docker:vars]
 compose_dir = /home/matt
+
+[windows]
+192.16.0.11

@@ -1,0 +1,14 @@
+---
+categories:
+  - Application
+  - Connectors
+  - CriticalUpdates
+  - DefinitionUpdates
+  - FeaturePacks
+  - Guidance
+  - SecurityUpdates
+  - ServicePacks
+  - UpdateRollups
+  - Updates
+blacklist:
+  - "Microsoft Silverlight"

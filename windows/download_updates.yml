@@ -1,0 +1,17 @@
+---
+- hosts: windows
+  gather_facts: false
+          
+  tasks:
+  - include_vars: win_updates.yml
+  
+  - name: Suche und downloade benoetigte Updates.
+    win_updates:
+      category_names:
+       "{{ categories }}"
+      state: downloaded
+      reboot: no
+    register: search_results
+   
+  - debug: 
+      msg: "Anzahl heruntergeladener Updates: {{ search_results.found_update_count }} \n"

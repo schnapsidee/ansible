@@ -1,0 +1,24 @@
+---
+- hosts: windows
+  gather_facts: yes
+  
+  tasks:
+  - include_vars: win_updates.yml
+  
+  - name: Suche benoetigte Updates.
+    win_updates:
+      category_names:
+       "{{ categories }}"
+      state: searched
+    register: search_results
+  - name: Starte Server bei Bedarf neu.
+    when: search_results.reboot_required|bool 
+    win_reboot:
+      reboot_timeout: 600
+  - name: Installiere alle Updates und starte neu.
+    win_updates:
+      category_names:
+        "{{ categories }}"
+      state: installed
+      reboot: yes
+      reboot_timeout: 600
